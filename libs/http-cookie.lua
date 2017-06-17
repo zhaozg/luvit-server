@@ -1,10 +1,12 @@
-exports.name = "zhaozg/http-cookie"
-exports.version = "0.1.2"
-exports.homepage = "https://github.com/zhaozg/luvit/blob/extend/deps/http-cookie.lua"
-exports.description = "An adapter for build and parse http cookies."
-exports.tags = {"http", "cookie", "adapter"}
-exports.license = "MIT"
-exports.author = { name = "zhaozg" }
+--[[lit-meta
+  name = "zhaozg/http-cookie"
+  version = "0.1.3"
+  homepage = "https://github.com/zhaozg/luvit/blob/extend/deps/http-cookie.lua"
+  description = "An adapter for build and parse http cookies."
+  tags = {"http", "cookie", "adapter"}
+  license = "MIT"
+  author = { name = "zhaozg" }
+]]
 
 local insert = table.insert
 local concat = table.concat
@@ -103,5 +105,7 @@ local function parse(data)
 	return res
 end
 
-exports.build = build
-exports.parse = parse
+return {
+	build = build,
+	parse = parse
+}
