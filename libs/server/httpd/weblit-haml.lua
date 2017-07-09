@@ -3,7 +3,10 @@ local haml = require('haml')
 local lhtml_compile = require('./lhtml')
 
 return function (base, options)
-  options = options or {format = "html5", cached=true}
+  options = options or {}
+  options.format = options.format or "html5"
+  options.cached = options.cached==nil and true or options.cached
+  options.lhaml = options.lhaml==nil and true or options.lhaml
   local fs = makeChroot(base)
   local _ENV = {}
   setmetatable(_ENV, {__index = _G})

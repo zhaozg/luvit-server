@@ -1,5 +1,17 @@
+- local a = "name"
+- local b = 'hello'
+- local msg = req.query.msg or 'NOMSG'
 %html
   %head
     %title SB Admin 2
   %body
     %a(href="index.html") abcd
+    %div
+      %li= #{a}
+      %li= #{b}
+      %li= #{msg}
+    = #{msg}
+
+:javascript
+  var msg='<%= msg%>';
+  alert(msg);
