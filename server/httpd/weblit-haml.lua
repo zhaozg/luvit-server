@@ -37,7 +37,8 @@ return function (base, options)
           fpath = fpath:sub(2)
         end
         local body = assert(fs.readFile(fpath))
-        body = assert(haml.render(body,options,_G))
+        setfenv(haml.render,_ENV)
+        body = assert(haml.render(body,options,_ENV))
         body = assert(lhtml_compile(body))
         body = table.concat(body,'')
         return body
