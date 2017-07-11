@@ -1,5 +1,5 @@
 
-local HTTPD = require'server/httpd'
+local HTTPD = require'./server/httpd'
 
 local httpd = HTTPD:new()
 
