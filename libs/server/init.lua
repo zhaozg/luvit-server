@@ -1,6 +1,6 @@
 return {
   name = "zhaozg/server",
-  version = "0.0.4",
+  version = "0.0.6",
   homepage = "https://github.com/zhaozg/luvit-server",
   description = "general http server for luvit.",
   tags = {"httpd", "server", "luvit"},
@@ -10,7 +10,7 @@ return {
     "**.lua",
   },
   dependencies = {
-    "zhaozg/haml@0.3.4",
+    "zhaozg/haml@0.3.6",
     "zhaozg/http-cookie@0.1.3"
   }
 }
