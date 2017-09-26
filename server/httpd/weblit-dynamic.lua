@@ -20,25 +20,48 @@ return function (getcode,options)
     if not options.cached then
         code = getcode(path)
         code = assert(loadstring(code))
-    elseif not caches[path] then
+    elseif caches[path] then
+        code = caches[path]
+    else
         code = getcode(path)
         code = assert(loadstring(code))
         caches[path]  = code
-    else
-        code = caches[path]
     end
 
     _ENV.req = req
     _ENV.res = res
     _ENV.require  = options.require or _ENV.require or require
-    local ret
-    if type(setfenv)=='function' then
-        setfenv(code, _ENV)
-        ret = code()
-    else
-        ret = code(_ENV)
+    local function errh(err)
+        local _, dbg = pcall(require,"StackTracePlus")
+        if _ then
+            dbg.traceback = dbg.stacktrace
+        else
+            dbg = require'debug'
+        end
+        return dbg.traceback(err, 2)
     end
-    res.statusCode = res.statusCode or 200
+    local _, ret = xpcall(function()
+        if type(setfenv)=='function' then
+            setfenv(code, _ENV)
+            ret = code()
+        else
+            ret = code(_ENV)
+        end
+    end,errh)
+    if _ then
+        res.statusCode = res.statusCode or 200
+        res.headers["Content-Type"] = res.headers["Content-Type"] or 'text/html'
+    else
+        res.statusCode = 500
+        res.headers["Content-Type"] = 'text/plain'
+        if req.log then
+            req.log.error(ret)
+        else
+            req.logger.error('Error:'..path)
+            req.logger.error(ret)
+        end
+        res.body = ret
+    end
     res.headers["Content-Type"] = res.headers["Content-Type"] or 'text/html'
     res.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     res.headers["Pragma"] = "no-cache"

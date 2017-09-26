@@ -9,7 +9,7 @@ local multipart  = require('./multipart').parse
 local unpack = unpack or table.unpack
 
 local Emitter = require('core').Emitter
-
+local logger = require('logging')
 ------------------------------------------------------------------------------
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 local function escape(str)
@@ -77,7 +77,19 @@ function HTTPD:initialize(options)
   options = options or {}
   local root = options.root or 'docs'
 
+  --prepare log process
+  local log = options.log or {}
+  log.log_level = log.log_level or logger.LEVELS.everything
+  if type(log.log_level)=='string' then
+    log.log_level  = logger.LEVELS[log.log_level]
+  end
+
+  logger.init(logger.StdoutFileLogger:new(log))
+
   self.options = options
+
+    -- Set an outer middleware for logging requests and responses
+  local weblit_logger = require('./weblit-logger')(logger)
 
   local handlers = {}
   self.handlers = handlers
@@ -103,6 +115,8 @@ function HTTPD:initialize(options)
       end
     end
 
+    req.logger = logger
+
     local body = {}
     req:on('data',function(chunk)
       body[#body+1] = chunk
@@ -110,6 +124,7 @@ function HTTPD:initialize(options)
 
     res:on('finish',function()
       self:emit('done',req,res)
+      weblit_logger(req, res)
     end)
 
     res:on('write',function()
@@ -140,8 +155,6 @@ function HTTPD:initialize(options)
     http.createServer(onRequest)
 
   self
-  -- Set an outer middleware for logging requests and responses
-  :use(require('./weblit-logger')(options.log))
 
   -- This adds missing headers, and tries to do automatic cleanup.
   :use(require('./weblit-auto-headers'))

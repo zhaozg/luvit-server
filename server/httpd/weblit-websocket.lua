@@ -76,7 +76,7 @@ local function websocketHandler(options, handler)
       })
       local success, err = pcall(handler, req, read, write)
       if not success then
-        print(err)
+        req.logger.error(err)
         write({
           opcode = 1,
           payload = err,
