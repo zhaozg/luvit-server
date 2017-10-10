@@ -1,7 +1,17 @@
 
 local HTTPD = require'./server/httpd'
 
-local httpd = HTTPD:new()
+local options = {}
+options.resty = {
+  ["/api/:module/:object:"] = {
+    ["method"]="require",
+    ["prefix"]="api",
+    ["module"]="module",
+    ["ext"]=".lua"
+  }
+}
+
+local httpd = HTTPD:new(options)
 
 httpd:on('check',function(req,res,go)
   req.logger.debug('check')

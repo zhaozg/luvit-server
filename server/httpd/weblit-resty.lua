@@ -13,6 +13,7 @@
 ]]
 
 local makeChroot = require('./weblit-fs')
+local caches = {}
 
 return function (base, options)
   local fs = makeChroot(base)
@@ -20,30 +21,32 @@ return function (base, options)
   local module = options.module or 'module'
   local ext = options.ext or '.lua'
 
+  local function getcode(fpath)
+    if fpath:byte(1) == 47 then
+      fpath = fpath:sub(2)
+    end
+    return assert(fs.readFile(fpath))
+  end
+
   return function (req, res, go)
     local path = string.format('%s/%s%s',prefix,req.params[module],ext)
-    local stat = fs.stat(path)
-    if not stat then return go() end
     req.params.path = path
-    if stat.type == "file" then
-      local dynamic = require('./weblit-dynamic')(function(fpath)
-        if fpath:byte(1) == 47 then
-          fpath = fpath:sub(2)
-        end
-        return assert(fs.readFile(fpath))
-      end,
-      {
-        cached=options.cached,
-        _ENV = _G
-      })
-
-      local methods = assert(dynamic(req,res,go))
-      assert(type(methods[req.method])=='function',
-        'not support '..req.method..' in module:'..module)
-
-      return methods[req.method](req,res)
+    local code
+    if caches[path] then
+      code = caches[path]
     else
-      return go()
+      local stat = fs.stat(path)
+      if not stat then return go() end
+      if stat.type == "file" then
+        code = getcode(path)
+        code = assert(loadstring(code))
+        caches[path]  = code
+      end
     end
+
+    local methods = assert(code())
+    assert(type(methods[req.method])=='function',
+      'not support '..req.method..' in module:'..module)
+    return methods[req.method](req,res)
   end
 end
