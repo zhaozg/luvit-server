@@ -1,6 +1,6 @@
 return {
   name = "zhaozg/server",
-  version = "0.0.9",
+  version = "0.0.10",
   homepage = "https://github.com/zhaozg/luvit-server",
   description = "general http server for luvit.",
   tags = {"httpd", "server", "luvit"},
