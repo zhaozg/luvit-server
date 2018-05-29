@@ -12,7 +12,21 @@ options.resty = {
 }
 
 local httpd = HTTPD:new(options)
+--[[
+  .websocket({
+    path = "/",
+    protocol = "test"
+  }, function (req, read, write)
+    print("New client")
+    for message in read do
+      message.mask = nil
+      write(message)
+    end
+    write()
+    print("Client left")
+  end)--
 
+--]]
 httpd:on('check',function(req,res,go)
   req.logger.debug('check')
   return go()

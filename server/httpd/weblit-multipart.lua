@@ -94,8 +94,9 @@ parse=function(body, boundary)
 end
 --]]
 
-exports.parse = parse
-return exports
+return {
+  parse = parse
+}
 
 --[===[
 local test = {

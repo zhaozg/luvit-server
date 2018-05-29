@@ -1,9 +1,8 @@
 --[[lit-meta
   name = "creationix/weblit-auto-headers"
-  version = "2.0.2"
+  version = "2.1.0"
   description = "The auto-headers middleware helps Weblit apps implement proper HTTP semantics"
   tags = {"weblit", "middleware", "http"}
-  dependencies = {}
   license = "MIT"
   author = { name = "Tim Caswell" }
   homepage = "https://github.com/creationix/weblit/blob/master/libs/weblit-auto-headers.lua"
@@ -16,7 +15,6 @@ Response automatic values:
  - Auto Server header
  - Auto Date Header
  - code defaults to 404 with body "Not Found\n"
- - if there is a string body add Content-Length and ETag if missing
  - if string body and no Content-Type, use text/plain for valid utf-8, application/octet-stream otherwise
  - Auto add "; charset=utf-8" to Content-Type when body is known to be valid utf-8
  - Auto 304 responses for if-none-match requests
@@ -28,11 +26,6 @@ Response automatic values:
 --TODO: utf8 scanning
 
 ]]
-
-local openssl = require('openssl')
-local function sha1(data)
-  return openssl.digest.digest('sha1',data)
-end
 
 local date = require('os').date
 
@@ -85,11 +78,6 @@ return function (req, res, go)
       if needLength then
         headers[#headers + 1] = {"Content-Length", #body}
       end
-      if not lowerHeaders.etag then
-        local etag = '"' .. sha1(body) .. '"'
-        lowerHeaders.etag = etag
-        headers[#headers + 1] = {"ETag", etag}
-      end
     else
       if needLength then
         headers[#headers + 1] = {"Transfer-Encoding", "chunked"}
@@ -104,8 +92,6 @@ return function (req, res, go)
   if requested and res.statusCode >= 200 and res.statusCode < 300 and requested == etag then
     res.statusCode = 304
     body = nil
-  elseif (not etag) then
-    res.statusCode = res.statusCode or 404
   end
 
   if isHead then body = nil end
