@@ -1,15 +1,17 @@
 local luvi  = require('luvi')
 
 --from luvit
-local http  = require("http")
+local url = require("url")
+local http = require("http")
 local https = require("https")
 local parseQuery  = require('querystring').parse
-local Emitter     = require('core').Emitter
-
+local Emitter = require('core').Emitter
 --from deps
-local logger    = require('logging')
+local logger  = require('logging')
 --from luvit-server
-local route     = require('./weblit-router')
+local route  = require('./weblit-router')
+local multipart = require('./weblit-multipart').parse
+
 
 local pathJoin  = luvi.path.join
 local unpack    = unpack or table.unpack
@@ -64,6 +66,31 @@ function HTTPD:initialize(options)
     req:on('end',function()
       body = #body>0 and table.concat(body) or nil
       req.body = body
+
+      req.parsed=url.parse(req.url)
+      --parse query
+      local pathname, query = req.url:match("^([^?]*)%??(.*)")
+      if #query > 0 then
+        query = parseQuery(query)
+      end
+      req.query = query or {}
+
+      --parse post body
+      if req.method=='POST' and req.body then 
+        local contenttype
+        for _,v in pairs(req.headers) do
+          if v[1] == 'Content-Type' then
+            contenttype = v[2]
+            break
+          end
+        end
+        if contenttype and contenttype:find('multipart/form-data',1,true)==1 then
+          req.post = multipart(req.body,contenttype)
+        else
+          req.post = parseQuery(req.body)
+        end
+      end
+
       self:emit('ifilter',req,res)
 
       local success, errmsg = pcall(router.run, req, res)
@@ -96,12 +123,13 @@ function HTTPD:initialize(options)
   -- acl check
   :use('check')
 
-  --
+  --[[
   if options.resty then
     for k,v in pairs(options.resty) do
         self:route({path = k}, require('./weblit-resty')(root,v) )
     end
   end
+  --]]
 
   self
   -- filter for lhtml file

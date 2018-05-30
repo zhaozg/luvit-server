@@ -1,19 +1,12 @@
 --[[lit-meta
   name = "creationix/weblit-router"
   version = "3.0.1"
-  dependencies = {
-    'luvit/querystring@2.0.0'
-  }
   description = "Weblit is a webapp framework designed around routes and middleware layers."
   tags = {"weblit", "router", "framework"}
   license = "MIT"
   author = { name = "Tim Caswell" }
   homepage = "https://github.com/creationix/weblit/blob/master/libs/weblit-app.lua"
 ]]
-
-local url = require("url")
-local parseQuery = require('querystring').parse
-local multipart = require('./weblit-multipart').parse
 
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 local function escape(str)
@@ -89,34 +82,10 @@ local function newRouter()
     local host = options.host and compileGlob(options.host)
     local filter = options.filter
     router.use(function (req, res, go)
-      if not req.parsed then req.parsed=url.parse(req.url) end
       if method and req.method ~= method then return go() end
       if host and not host(req.headers.host) then return go() end
       if filter and not filter(req) then return go() end
       
-      --parse query
-      local pathname, query = req.url:match("^([^?]*)%??(.*)")
-      if #query > 0 then
-        req.query = parseQuery(query) or {}
-      end 
-
-      --parse post body
-      if req.method=='POST' and req.body then 
-        local contenttype
-        for _,v in pairs(req.headers) do
-          if v[1] == 'Content-Type' then
-            contenttype = v[2]
-            break
-          end
-        end
-        if contenttype and contenttype:find('multipart/form-data',1,true)==1 then
-          req.post = multipart(req.body,contenttype)
-        else
-          req.post = parseQuery(req.body)
-        end
-      end
-
-      --parse params match with :name
       local params
       if path then
         params = path(pathname)

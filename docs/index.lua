@@ -1,7 +1,7 @@
 p('req',req)
 p('res',res)
 
-req.log.warning('this is warn')
+req.logger.warning('this is warn')
 
 res.body=[[
 <!DOCTYPE html>
