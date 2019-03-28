@@ -64,6 +64,7 @@ local table = {
   gz = "application/x-gzip",
   h = "text/x-c",
   hh = "text/x-c",
+  htc = "text/x-component",
   htm = "text/html",
   html = "text/html",
   ico = "image/vnd.microsoft.icon",

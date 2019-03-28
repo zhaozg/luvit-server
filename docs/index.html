@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>luvit httpd server sample pages</title>
+<script src='./jquery-1.11.3.min.js' ></script>
 </head>
 <body>
 Go to <a href="index.html">index.html</a>
@@ -11,5 +12,11 @@ Go to <a href="index.lua">index.lua</a>
 Go to <a href="error.haml">error.haml</a>
 Go to <a href="error.lua">error.lua</a>
 Go to <a href="/api/resty/">restful api</a>
+  <script>
+    var empty ='';
+    var body =' body';
+    alert($.trim(empty)+"E:"+!$.trim(empty));
+    alert($.trim(body)+"B:"+!$.trim(body));
+  </script>
 </body>
 </html>

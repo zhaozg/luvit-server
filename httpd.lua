@@ -11,6 +11,9 @@ options.resty = {
   }
 }
 
+options.haml = {cached = false}
+options.cached = false
+options.port = 80
 local httpd = HTTPD:new(options)
 --[[
   .websocket({
@@ -28,18 +31,21 @@ local httpd = HTTPD:new(options)
 
 --]]
 httpd:on('check',function(req,res,go)
-  req.logger.debug('check')
+  --req.logger.debug('check')
   return go()
 end)
 
 httpd:on('done',function(req,res)
-  req.logger.debug('done')
+  --req.logger.debug('done')
 end)
 
 httpd:on('ofilter',function(req,res)
-  req.logger.debug('ofilter')
+  --req.logger.debug('ofilter')
+  if res.statusCode==304 then
+    return
+  end
   if not res.body then
-    res.body = string.format('<html><body><h1>%d</h1></body></html>',res.statusCode)
+    res.statusCode = 404
   end
 end)
 
