@@ -28,17 +28,24 @@ return function (base, options)
       end
 
       local ret = {}
-      function _ENV.print(...)
-        table.insert(ret,...)
-      end
-
-      local dynamic = require('./weblit-dynamic')(function(fpath)
+      local function handler(fpath)
         if fpath:byte(1) == 47 then
           fpath = fpath:sub(2)
         end
         local body = assert(fs.readFile(fpath))
         setfenv(haml.render,_ENV)
         body = assert(haml.render(body,options,_ENV))
+        return body
+      end
+      function _ENV.print(...)
+        table.insert(ret,...)
+      end
+      function _ENV.include(fpath)
+        return handler(fpath)
+      end
+
+      local dynamic = require('./weblit-dynamic')(function(fpath)
+        local body = handler(fpath)
         body = assert(lhtml_compile(body))
         body = table.concat(body,'')
         return body
