@@ -85,7 +85,7 @@ local function newRouter()
       if method and req.method ~= method then return go() end
       if host and not host(req.headers.host) then return go() end
       if filter and not filter(req) then return go() end
-      
+
       local params
       if path then
         params = path(pathname)

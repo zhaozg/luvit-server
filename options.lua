@@ -3,13 +3,13 @@ include = function(s)
 end
 
 return {
-  root = [[./docs]],
+  root = './docs',
   port = 80,
   haml = {
-    cached = false
+    cached = true
   },
   static = {
-    cached = false,
+    cached = true,
     index = {"index.haml","index.html"}
   },
 }

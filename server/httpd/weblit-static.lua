@@ -81,7 +81,7 @@ return function (rootPath, options)
       end
 
       for i=1,#entries do
-        entry = entries[i]
+        local entry = entries[i]
         if entry.name == "index.html" and entry.type == "file" then
           path = (#path > 0 and path .. "/" or "") .. "index.html"
           return renderFile()

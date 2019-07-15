@@ -1,5 +1,3 @@
-local luvi  = require('luvi')
-
 --from luvit
 local url = require("url")
 local http = require("http")
@@ -12,9 +10,6 @@ local logger  = require('logging')
 local route  = require('./weblit-router')
 local multipart = require('./weblit-multipart').parse
 
-
-local pathJoin  = luvi.path.join
-local unpack    = unpack or table.unpack
 ------------------------------------------------------------------------------
 local HTTPD = Emitter:extend()
 
@@ -76,7 +71,7 @@ function HTTPD:initialize(options)
       req.query = query or {}
 
       --parse post body
-      if req.method=='POST' and req.body then 
+      if req.method=='POST' and req.body then
         local contenttype
         for _,v in pairs(req.headers) do
           if v[1] == 'Content-Type' then
