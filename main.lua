@@ -2,14 +2,16 @@
 return require('./init')(function()
 io.stdout:setvbuf 'no'
 
-
-local HTTPD = require'server/httpd'
 local options = require'./options'
+local _, HTTPD
+_, HTTPD =  pcall(require, './server/httpd')
+if not _ then
+  HTTPD = assert(require('server/httpd'))
+end
 
 local httpd = HTTPD:new(options)
 
 httpd:on('ofilter',function(req,res)
-  --req.logger.debug('ofilter')
   if res.statusCode==304 then
     return
   end

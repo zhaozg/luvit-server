@@ -1,1 +1,1 @@
-req.logger.warningx('this is warn')
+req.logger.info('this is warn')

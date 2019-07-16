@@ -24,7 +24,7 @@ function HTTPD:initialize(options)
     log.log_level  = logger.LEVELS[log.log_level]
   end
 
-  logger.init(logger.StdoutFileLogger:new(log))
+  logger.init(logger.StdoutLogger:new(log))
 
   self.options = options
 
@@ -59,8 +59,7 @@ function HTTPD:initialize(options)
     end)
 
     req:on('end',function()
-      body = #body>0 and table.concat(body) or nil
-      req.body = body
+      req.body = #body>0 and table.concat(body) or nil
 
       req.parsed=url.parse(req.url)
       --parse query
@@ -100,21 +99,17 @@ function HTTPD:initialize(options)
     end)
   end
 
-  server = options.secure and
+  local server = options.secure and
     https.createServer(options.secure, onRequest) or
     http.createServer(onRequest)
 
   self
-
   -- This adds missing headers, and tries to do automatic cleanup.
   :use(require('./weblit-auto-headers'))
-
   -- A caching proxy layer for backends supporting Etags
   :use(require('./weblit-etag-cache'))
-
   -- session base cookie
   :use(require('./weblit-session'))
-
   -- acl check
   :use('check')
 

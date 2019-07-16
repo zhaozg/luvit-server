@@ -10,6 +10,6 @@ return {
   },
   static = {
     cached = true,
-    index = {"index.haml","index.html"}
   },
+  index = {"index.haml","index.html"}
 }
