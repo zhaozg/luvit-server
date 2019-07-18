@@ -113,13 +113,11 @@ function HTTPD:initialize(options)
   -- acl check
   :use('check')
 
-  --[[
   if options.resty then
     for k,v in pairs(options.resty) do
-        self:route({path = k}, require('./weblit-resty')(root,v) )
+      self:route({path = k}, require('./weblit-resty')(root, v) )
     end
   end
-  --]]
 
   self
   -- filter for lhtml file

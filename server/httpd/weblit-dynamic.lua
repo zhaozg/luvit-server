@@ -43,9 +43,9 @@ return function (getcode,options)
     local _, ret = xpcall(function()
         if type(setfenv)=='function' then
             setfenv(code, _ENV)
-            ret = code()
+            return code()
         else
-            ret = code(_ENV)
+            return code(_ENV)
         end
     end,errh)
     if _ then

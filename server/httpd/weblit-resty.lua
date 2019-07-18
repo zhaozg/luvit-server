@@ -40,13 +40,31 @@ return function (base, options)
       if stat.type == "file" then
         code = getcode(path)
         code = assert(loadstring(code))
+
+        local _ENV = setmetatable({}, {__index = _G})
+        _ENV.require  = require
+        setfenv(code, _ENV)
+        code = assert(code())
         caches[path]  = code
       end
     end
 
-    local methods = assert(code())
-    assert(type(methods[req.method])=='function',
-      'not support '..req.method..' in module:'..module)
-    return methods[req.method](req,res)
+    local _ENV = setmetatable({}, {__index = _G})
+    _ENV.req = req
+    _ENV.res = res
+    _ENV.require  = require
+    local method = req.method
+
+    io.write(string.format('1 %s\n',require))
+
+    assert(type(code[method])=='function',
+      'not support '..method..' in module:'..module)
+
+    if type(setfenv)=='function' then
+      setfenv(code[method], _ENV)
+      return code[method](req, res)
+    else
+      return code[method](_ENV)
+    end
   end
 end

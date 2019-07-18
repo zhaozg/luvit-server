@@ -88,7 +88,7 @@ local function newRouter()
 
       local params
       if path then
-        params = path(pathname)
+        params = path(req.parsed.pathname)
         if not params then return go() end
       end
       req.params = params or {}
