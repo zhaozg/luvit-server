@@ -55,8 +55,6 @@ return function (base, options)
     _ENV.require  = require
     local method = req.method
 
-    io.write(string.format('1 %s\n',require))
-
     assert(type(code[method])=='function',
       'not support '..method..' in module:'..module)
 
