@@ -24,7 +24,7 @@ function HTTPD:initialize(options)
     log.log_level  = logger.LEVELS[log.log_level]
   end
 
-  logger.init(logger.StdoutLogger:new(log))
+  logger.init(logger.FileLogger:new(log))
 
   self.options = options
 
