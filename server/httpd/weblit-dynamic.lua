@@ -54,11 +54,12 @@ return function (getcode,options)
     else
         res.statusCode = 500
         res.headers["Content-Type"] = 'text/plain'
-        if req.log then
-            req.log.error(ret)
-        else
+        if req.logger then
             req.logger.error('Error:'..path)
             req.logger.error(ret)
+        else
+            print('Error:'..path)
+            print(ret)
         end
         res.body = ret
     end
