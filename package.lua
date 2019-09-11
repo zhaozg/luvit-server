@@ -12,7 +12,7 @@ return {
   dependencies = {
     "zhaozg/haml@0.3.9",
     "zhaozg/http-cookie@0.1.3",
-    "rphillips/logging@1.1.11"
+    "rphillips/logging@1.1.12"
   }
 }
 

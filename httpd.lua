@@ -14,6 +14,11 @@ options.resty = {
 options.haml = {cached = false}
 options.cached = false
 options.port = 80
+options.log = {
+  path = "access.log",
+  log_level = "everything"
+}
+
 local httpd = HTTPD:new(options)
 --[[
   .websocket({
