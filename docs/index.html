@@ -12,11 +12,23 @@ Go to <a href="index.lua">index.lua</a>
 Go to <a href="error.haml">error.haml</a>
 Go to <a href="error.lua">error.lua</a>
 Go to <a href="/api/resty/">restful api</a>
+Active <a href="javascript:access_ws();">WebSocket</a>
   <script>
     var empty ='';
     var body =' body';
     console.log($.trim(empty)+"E:"+!$.trim(empty));
     console.log($.trim(body)+"B:"+!$.trim(body));
+
+    function access_ws() {
+      var ws = new WebSocket('ws://'+window.location.host+'/ws.lua')
+      ws.onmessage = function (ev) {
+        console.log('GOT', ev.data)
+      }
+      ws.onopen = function(event) {
+        console.log("WebSocket is open now.");
+        ws.send('foo');
+      };
+    }
   </script>
 </body>
 </html>

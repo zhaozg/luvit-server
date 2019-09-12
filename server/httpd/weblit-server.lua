@@ -9,7 +9,6 @@ local logger  = require('logging')
 --from luvit-server
 local route  = require('./weblit-router')
 local multipart = require('./weblit-multipart').parse
-
 ------------------------------------------------------------------------------
 local HTTPD = Emitter:extend()
 
@@ -40,7 +39,11 @@ function HTTPD:initialize(options)
 
     local body = {}
     req:on('data',function(chunk)
-      body[#body+1] = chunk
+      if req.is_upgrade then
+        req:emit('message', data)
+      else
+        body[#body+1] = chunk
+      end
     end)
 
     res:on('finish',function()
@@ -119,6 +122,18 @@ function HTTPD:initialize(options)
     end
   end
 
+  -- Websocket connections must be GET requests
+  -- with 'Upgrade: websocket'
+  -- and 'Connection: Upgrade' headers
+  local function isWebsocket(REQ)
+    local upgrade = REQ.headers.Upgrade
+    local connection = REQ.headers.Connection
+    local ret = REQ.method == "GET" and
+      upgrade and upgrade:lower():find("websocket", 1, true) and
+      connection and connection:lower():find("upgrade", 1, true)
+    return ret
+  end
+
   self
   -- filter for lhtml file
   :route({
@@ -133,6 +148,11 @@ function HTTPD:initialize(options)
       return req.parsed.pathname:match('%.haml$')
     end
   }, require('./weblit-haml')(root, options.haml or {}))
+
+  -- filter for websocket
+  :route({
+    filter = isWebsocket,
+  }, require('./weblit-websocket')(root, options.websocket or {}))
 
   -- filter for dynamic page generate from lua file
   :route({
