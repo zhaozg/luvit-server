@@ -10,6 +10,7 @@ return {
     "**.lua",
   },
   dependencies = {
+    "zhaozg/server@0.1.16",
     "zhaozg/haml@0.3.9",
     "zhaozg/http-cookie@0.1.3",
     "rphillips/logging@1.1.12"

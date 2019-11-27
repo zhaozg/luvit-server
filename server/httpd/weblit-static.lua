@@ -75,7 +75,8 @@ return function (rootPath, options)
       if options.index then
         for i=1,#options.index do
           if (index(entries, options.index[i], true)) then
-            return
+            res.body = "Redirect to "..options.index[i]
+            return true
           end
         end
       end
